@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GlobalExceptionHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">sum2_fs3</a> &gt; <a href="index.source.html" class="el_package">com.newproject.exception</a> &gt; <span class="el_source">GlobalExceptionHandler.java</span></div><h1>GlobalExceptionHandler.java</h1><pre class="source lang-java linenums">package com.newproject.exception;
+
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@ControllerAdvice
+<span class="fc" id="L18">public class GlobalExceptionHandler {</span>
+
+<span class="fc" id="L20">    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);</span>
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity&lt;Map&lt;String, String&gt;&gt; handleValidationExceptions(MethodArgumentNotValidException ex) {
+<span class="nc" id="L25">        logger.error(&quot;Excepción de validación capturada: {}&quot;, ex.getMessage());</span>
+
+<span class="nc" id="L27">        Map&lt;String, String&gt; errores = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L28">        ex.getBindingResult().getAllErrors().forEach(error -&gt; {</span>
+<span class="nc" id="L29">            String campo = ((FieldError) error).getField();</span>
+<span class="nc" id="L30">            String mensaje = error.getDefaultMessage();</span>
+<span class="nc" id="L31">            errores.put(campo, mensaje);</span>
+<span class="nc" id="L32">            logger.error(&quot;Error en el campo {}: {}&quot;, campo, mensaje);</span>
+<span class="nc" id="L33">        });</span>
+<span class="nc" id="L34">        return new ResponseEntity&lt;&gt;(errores, HttpStatus.BAD_REQUEST);</span>
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity&lt;String&gt; handleResourceNotFoundException(ResourceNotFoundException ex) {
+<span class="fc" id="L40">        logger.error(&quot;Recurso no encontrado: {}&quot;, ex.getMessage());</span>
+<span class="fc" id="L41">        return new ResponseEntity&lt;&gt;(ex.getMessage(), HttpStatus.NOT_FOUND);</span>
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResponseEntity&lt;String&gt; handleGlobalException(Exception ex) {
+<span class="fc" id="L47">        logger.error(&quot;Excepción no capturada: {}&quot;, ex.getMessage(), ex);</span>
+<span class="fc" id="L48">        return new ResponseEntity&lt;&gt;(&quot;Error interno en el servidor: &quot; + ex.getMessage(),</span>
+                HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

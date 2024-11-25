@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UsuarioService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">sum2_fs3</a> &gt; <a href="index.source.html" class="el_package">com.newproject.service</a> &gt; <span class="el_source">UsuarioService.java</span></div><h1>UsuarioService.java</h1><pre class="source lang-java linenums">package com.newproject.service;
+
+import com.newproject.exception.ResourceNotFoundException;
+import com.newproject.model.Role;
+import com.newproject.model.Usuario;
+import com.newproject.repository.UsuarioRepository;
+import java.util.Optional; 
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
+
+import jakarta.validation.Valid;
+
+
+import java.util.List;
+
+@Validated
+@Service
+public class UsuarioService {
+
+    private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
+
+<span class="fc" id="L24">    public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {</span>
+<span class="fc" id="L25">        this.usuarioRepository = usuarioRepository;</span>
+<span class="fc" id="L26">        this.passwordEncoder = passwordEncoder;</span>
+<span class="fc" id="L27">    }</span>
+
+    private void validarUsuario(Usuario usuario) {
+<span class="pc bpc" id="L30" title="2 of 4 branches missed.">        if (usuario.getNombre() == null || usuario.getNombre().isEmpty()) {</span>
+<span class="nc" id="L31">            throw new IllegalArgumentException(&quot;El nombre es obligatorio.&quot;);</span>
+        }
+<span class="pc bpc" id="L33" title="2 of 4 branches missed.">        if (usuario.getApellido() == null || usuario.getApellido().isEmpty()) {</span>
+<span class="nc" id="L34">            throw new IllegalArgumentException(&quot;El apellido es obligatorio.&quot;);</span>
+        }
+<span class="pc bpc" id="L36" title="2 of 4 branches missed.">        if (usuario.getUsername() == null || usuario.getUsername().isEmpty()) {</span>
+<span class="nc" id="L37">            throw new IllegalArgumentException(&quot;El nombre de usuario es obligatorio.&quot;);</span>
+        }
+<span class="pc bpc" id="L39" title="2 of 4 branches missed.">        if (usuario.getPassword() == null || usuario.getPassword().isEmpty()) {</span>
+<span class="nc" id="L40">            throw new IllegalArgumentException(&quot;La contraseña es obligatoria.&quot;);</span>
+        }
+<span class="pc bpc" id="L42" title="2 of 4 branches missed.">        if (usuario.getEmail() == null || usuario.getEmail().isEmpty()) {</span>
+<span class="nc" id="L43">            throw new IllegalArgumentException(&quot;El correo electrónico es obligatorio.&quot;);</span>
+        }
+<span class="pc bpc" id="L45" title="1 of 2 branches missed.">        if (usuario.getRol() == null) {</span>
+<span class="nc" id="L46">            throw new IllegalArgumentException(&quot;El rol es obligatorio.&quot;);</span>
+        }
+<span class="fc" id="L48">    }</span>
+
+    public Usuario registrarUsuario(@Valid Usuario usuario) {
+<span class="fc" id="L51">        validarUsuario(usuario);</span>
+<span class="fc" id="L52">        usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));</span>
+<span class="fc" id="L53">        return usuarioRepository.save(usuario);</span>
+    }
+
+    public Optional&lt;Usuario&gt; buscarPorUsername(String username) {
+<span class="fc" id="L57">        return usuarioRepository.findByUsername(username);</span>
+    }
+
+    public Usuario buscarPorEmail( String email) {
+<span class="fc" id="L61">        return usuarioRepository.findByEmail(email)</span>
+<span class="pc" id="L62">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Correo no encontrado: &quot; + email));</span>
+    }
+
+    public Boolean existePorUsername(String username) {
+<span class="fc" id="L66">        return usuarioRepository.existsByUsername(username);</span>
+    }
+
+    public Boolean existePorEmail(String email) {
+<span class="fc" id="L70">        return usuarioRepository.existsByEmail(email);</span>
+    }
+
+    public List&lt;Usuario&gt; obtenerTodosLosUsuarios() {
+<span class="fc" id="L74">        return usuarioRepository.findAll();</span>
+    }
+
+    public boolean esAdmin(String username) {
+<span class="fc" id="L78">        Usuario usuario = buscarPorUsername(username)</span>
+<span class="pc" id="L79">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Usuario no encontrado: &quot; + username));</span>
+<span class="pc bpc" id="L80" title="1 of 2 branches missed.">        return usuario.getRol() == Role.ROLE_ADMIN; </span>
+    }
+
+    public Usuario actualizarUsuario(Long id, @Valid Usuario usuarioActualizado) {
+<span class="fc" id="L84">        Usuario usuario = usuarioRepository.findById(id)</span>
+<span class="pc" id="L85">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Usuario no encontrado con ID: &quot; + id));</span>
+
+<span class="fc" id="L87">        usuario.setUsername(usuarioActualizado.getUsername());</span>
+
+<span class="pc bpc" id="L89" title="1 of 2 branches missed.">        if (!usuarioActualizado.getPassword().equals(usuario.getPassword())) {</span>
+<span class="fc" id="L90">            usuario.setPassword(passwordEncoder.encode(usuarioActualizado.getPassword()));</span>
+        }
+
+<span class="fc" id="L93">        usuario.setEmail(usuarioActualizado.getEmail());</span>
+<span class="fc" id="L94">        usuario.setNombre(usuarioActualizado.getNombre());</span>
+<span class="fc" id="L95">        usuario.setApellido(usuarioActualizado.getApellido());</span>
+<span class="fc" id="L96">        usuario.setRol(usuarioActualizado.getRol());</span>
+<span class="fc" id="L97">        return usuarioRepository.save(usuario);</span>
+    }
+
+    public void eliminarUsuario(Long id) {
+<span class="fc" id="L101">        Usuario usuario = usuarioRepository.findById(id)</span>
+<span class="pc" id="L102">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Usuario no encontrado con ID: &quot; + id));</span>
+<span class="fc" id="L103">        usuarioRepository.delete(usuario);</span>
+<span class="fc" id="L104">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

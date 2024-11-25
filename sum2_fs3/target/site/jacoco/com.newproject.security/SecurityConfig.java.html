@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SecurityConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">sum2_fs3</a> &gt; <a href="index.source.html" class="el_package">com.newproject.security</a> &gt; <span class="el_source">SecurityConfig.java</span></div><h1>SecurityConfig.java</h1><pre class="source lang-java linenums">package com.newproject.security;
+
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig implements WebMvcConfigurer {
+
+<span class="fc" id="L28">    private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);</span>
+
+    private final JwtRequestFilter jwtRequestFilter;
+    private static final String ROLE_ADMIN = &quot;ADMIN&quot;; // Definir constante
+    private static final String ROLE_USER = &quot;USER&quot;; // Definir constante
+
+
+<span class="fc" id="L35">    public SecurityConfig(JwtRequestFilter jwtRequestFilter) {</span>
+<span class="fc" id="L36">        this.jwtRequestFilter = jwtRequestFilter;</span>
+<span class="fc" id="L37">    }</span>
+  
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+<span class="fc" id="L41">        CorsConfiguration corsConfig = new CorsConfiguration();</span>
+<span class="fc" id="L42">        corsConfig.setAllowedOrigins(List.of(&quot;http://localhost:4200&quot;, &quot;http://localhost:80&quot;));</span>
+<span class="fc" id="L43">        corsConfig.setAllowedMethods(List.of(&quot;GET&quot;, &quot;POST&quot;, &quot;PUT&quot;, &quot;DELETE&quot;, &quot;OPTIONS&quot;));</span>
+<span class="fc" id="L44">        corsConfig.setAllowedHeaders(List.of(&quot;*&quot;));</span>
+<span class="fc" id="L45">        corsConfig.setAllowCredentials(true);</span>
+        
+<span class="fc" id="L47">        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();</span>
+<span class="fc" id="L48">        source.registerCorsConfiguration(&quot;/**&quot;, corsConfig);</span>
+<span class="fc" id="L49">        return source;</span>
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+<span class="fc" id="L54">        logger.info(&quot;Configurando SecurityFilterChain&quot;);</span>
+
+<span class="fc" id="L56">        http</span>
+<span class="fc" id="L57">                .csrf(csrf -&gt; csrf.disable()) </span>
+<span class="fc" id="L58">                .cors(cors -&gt; cors.configurationSource(corsConfigurationSource())) // Usa el corsConfigurationSource creado</span>
+<span class="fc" id="L59">                .authorizeHttpRequests(auth -&gt; auth</span>
+                        // Permitir acceso sin autenticación a login, registro y solicitudes OPTIONS
+<span class="fc" id="L61">                        .requestMatchers(&quot;/api/auth/login&quot;, &quot;/api/usuarios/register&quot;).permitAll()</span>
+<span class="fc" id="L62">                        .requestMatchers(HttpMethod.OPTIONS, &quot;/**&quot;).permitAll() </span>
+<span class="fc" id="L63">                        .requestMatchers(&quot;/images/**&quot;).permitAll()</span>
+                        // Reglas específicas para usuarios y administradores
+<span class="fc" id="L65">                        .requestMatchers(HttpMethod.GET, &quot;/api/usuarios/{username}&quot;).hasAnyRole(ROLE_USER, ROLE_ADMIN) </span>
+<span class="fc" id="L66">                        .requestMatchers(HttpMethod.PUT, &quot;/api/usuarios/{id}&quot;).hasAnyRole(ROLE_USER, ROLE_ADMIN) </span>
+<span class="fc" id="L67">                        .requestMatchers(HttpMethod.DELETE, &quot;/api/usuarios/{id}&quot;).hasAnyRole(ROLE_USER, ROLE_ADMIN) </span>
+<span class="fc" id="L68">                        .requestMatchers(HttpMethod.GET, &quot;/api/usuarios&quot;).hasRole(ROLE_ADMIN) </span>
+
+                        // Rutas para productos
+<span class="fc" id="L71">                        .requestMatchers(HttpMethod.GET, &quot;/api/productos/**&quot;).permitAll() </span>
+<span class="fc" id="L72">                        .requestMatchers(HttpMethod.POST, &quot;/api/productos&quot;).hasRole(ROLE_ADMIN) </span>
+<span class="fc" id="L73">                        .requestMatchers(HttpMethod.PUT, &quot;/api/productos/{id}&quot;).hasRole(ROLE_ADMIN)</span>
+<span class="fc" id="L74">                        .requestMatchers(HttpMethod.DELETE, &quot;/api/productos/{id}&quot;).hasRole(ROLE_ADMIN)</span>
+
+                        // Cualquier otra solicitud necesita autenticación
+<span class="fc" id="L77">                        .anyRequest().authenticated())</span>
+<span class="fc" id="L78">                .sessionManagement(session -&gt; session</span>
+<span class="fc" id="L79">                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)</span>
+                )
+<span class="fc" id="L81">                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);</span>
+
+<span class="fc" id="L83">        return http.build();</span>
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+<span class="fc" id="L88">        return new BCryptPasswordEncoder();</span>
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
+            throws Exception {
+<span class="fc" id="L94">        return authenticationConfiguration.getAuthenticationManager();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

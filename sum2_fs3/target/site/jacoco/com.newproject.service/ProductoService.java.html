@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProductoService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">sum2_fs3</a> &gt; <a href="index.source.html" class="el_package">com.newproject.service</a> &gt; <span class="el_source">ProductoService.java</span></div><h1>ProductoService.java</h1><pre class="source lang-java linenums">package com.newproject.service;
+
+import com.newproject.model.Producto;
+import com.newproject.repository.ProductoRepository;
+import org.springframework.core.io.UrlResource;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.Resource;
+import org.springframework.util.StringUtils;
+
+import com.newproject.exception.FileProcessingException;
+import com.newproject.exception.ResourceNotFoundException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Optional;
+import java.io.IOException;
+import java.nio.file.Path;
+
+
+@Service
+public class ProductoService {
+
+    private final ProductoRepository productoRepository;
+<span class="fc" id="L25">    protected final Path rutaDirectorio = Paths.get(&quot;src/main/resources/static/images/&quot;);</span>
+
+<span class="fc" id="L27">    public ProductoService(ProductoRepository productoRepository) throws IOException {</span>
+<span class="fc" id="L28">        this.productoRepository = productoRepository;</span>
+<span class="fc" id="L29">        Files.createDirectories(rutaDirectorio);</span>
+<span class="fc" id="L30">    }</span>
+
+    public String guardarImagen(MultipartFile archivo) throws IOException {
+<span class="fc" id="L33">        String nombreArchivo = archivo.getOriginalFilename();</span>
+<span class="pc bpc" id="L34" title="2 of 4 branches missed.">        if (nombreArchivo == null || nombreArchivo.isBlank()) {</span>
+<span class="nc" id="L35">            throw new IllegalArgumentException(&quot;El archivo no tiene un nombre válido&quot;);</span>
+        }
+<span class="fc" id="L37">        nombreArchivo = StringUtils.cleanPath(nombreArchivo);</span>
+    
+<span class="fc" id="L39">        Path destino = rutaDirectorio.resolve(nombreArchivo);</span>
+<span class="fc" id="L40">        Files.copy(archivo.getInputStream(), destino);</span>
+    
+<span class="fc" id="L42">        return nombreArchivo;</span>
+    }
+
+    public Resource cargarImagen(String nombreArchivo) throws IOException {
+<span class="fc" id="L46">        Path archivo = rutaDirectorio.resolve(nombreArchivo).normalize();</span>
+<span class="fc" id="L47">        Resource recurso = new UrlResource(archivo.toUri());</span>
+
+<span class="pc bpc" id="L49" title="3 of 4 branches missed.">        if (recurso.exists() || recurso.isReadable()) {</span>
+<span class="fc" id="L50">            return recurso;</span>
+        } else {
+<span class="nc" id="L52">            throw new ResourceNotFoundException(&quot;No se pudo leer el archivo&quot;);</span>
+        }
+    }
+
+    public Resource obtenerImagen(String nombreImagen) {
+        try {
+<span class="fc" id="L58">            Path rutaArchivo = Paths.get(&quot;src/main/resources/static/images&quot;)</span>
+<span class="fc" id="L59">                                    .resolve(nombreImagen)</span>
+<span class="fc" id="L60">                                    .normalize();</span>
+
+            // Validar si la ruta está fuera del directorio permitido
+<span class="pc bpc" id="L63" title="1 of 2 branches missed.">            if (!rutaArchivo.startsWith(&quot;src/main/resources/static/images&quot;)) {</span>
+<span class="nc" id="L64">                throw new SecurityException(&quot;Acceso no autorizado al archivo: &quot; + nombreImagen);</span>
+            }
+
+<span class="fc" id="L67">            Resource recurso = new UrlResource(rutaArchivo.toUri());</span>
+
+<span class="pc bpc" id="L69" title="2 of 4 branches missed.">            if (!recurso.exists() || !recurso.isReadable()) {</span>
+<span class="nc" id="L70">                throw new ResourceNotFoundException(&quot;Archivo no encontrado o no legible: &quot; + nombreImagen);</span>
+            }
+
+<span class="fc" id="L73">            return recurso;</span>
+
+<span class="nc" id="L75">        } catch (Exception ex) {</span>
+            // Usar la excepción personalizada para mayor claridad
+<span class="nc" id="L77">            throw new FileProcessingException(&quot;Error al obtener el archivo: &quot; + nombreImagen, ex);</span>
+        }
+    }
+
+    
+ 
+    public List&lt;Producto&gt; obtenerTodosLosProductos() {
+<span class="fc" id="L84">        return productoRepository.findAll();</span>
+    }
+    
+    public Optional&lt;Producto&gt; obtenerProductoPorId(Long id) {
+<span class="fc" id="L88">        return productoRepository.findById(id);</span>
+    }
+    
+    public Producto crearProducto(Producto producto) {
+<span class="fc" id="L92">        return productoRepository.save(producto);</span>
+    }
+
+    public Producto actualizarProducto(Long id, Producto productoActualizado) {
+<span class="fc" id="L96">        return productoRepository.findById(id)</span>
+<span class="fc" id="L97">                .map(producto -&gt; {</span>
+<span class="fc" id="L98">                    producto.setNombre(productoActualizado.getNombre());</span>
+<span class="fc" id="L99">                    producto.setPrecio(productoActualizado.getPrecio());</span>
+<span class="fc" id="L100">                    producto.setDescripcion(productoActualizado.getDescripcion());</span>
+<span class="fc" id="L101">                    producto.setStock(productoActualizado.getStock());</span>
+<span class="fc" id="L102">                    producto.setUrl(productoActualizado.getUrl());</span>
+<span class="fc" id="L103">                    producto.setNuevo(productoActualizado.getNuevo());</span>
+<span class="fc" id="L104">                    return productoRepository.save(producto);</span>
+                })
+<span class="pc" id="L106">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Producto no encontrado&quot;));</span>
+    }
+    
+    public void eliminarProducto(Long id) {
+<span class="fc" id="L110">        Producto producto = productoRepository.findById(id)</span>
+<span class="pc" id="L111">            .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Producto no encontrado&quot;));</span>
+
+<span class="fc" id="L113">         String imagenUrl = producto.getUrl(); </span>
+
+        try {
+<span class="fc" id="L116">            Path imagenPath = rutaDirectorio.resolve(imagenUrl);  </span>
+<span class="fc" id="L117">            Files.deleteIfExists(imagenPath); </span>
+<span class="nc" id="L118">        } catch (IOException e) {</span>
+<span class="nc" id="L119">            throw new ResourceNotFoundException(&quot;Error al eliminar la imagen&quot; + e);</span>
+<span class="fc" id="L120">        }</span>
+<span class="fc" id="L121">        productoRepository.deleteById(id);</span>
+<span class="fc" id="L122">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -1,0 +1,11 @@
+com/newproject/security/JwtUtilTest.class
+com/newproject/DemoApplicationTest.class
+com/newproject/controller/UsuarioControllerTest.class
+com/newproject/service/ProductoServiceTest.class
+com/newproject/controller/ProductoControllerTest.class
+com/newproject/exception/FileProcessingExceptionTest.class
+com/newproject/exception/ResourceNotFoundExceptionTest.class
+com/newproject/controller/AuthControllerTest.class
+com/newproject/service/UsuarioServiceTest.class
+com/newproject/service/CustomUserDetailsServiceTest.class
+com/newproject/exception/GlobalExceptionHandlerTest.class

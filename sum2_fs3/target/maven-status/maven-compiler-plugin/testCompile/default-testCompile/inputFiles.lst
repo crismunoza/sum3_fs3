@@ -1,0 +1,11 @@
+/home/cris/Descargas/Sum2_fs3/sum2_fs3/src/test/java/com/newproject/DemoApplicationTest.java
+/home/cris/Descargas/Sum2_fs3/sum2_fs3/src/test/java/com/newproject/controller/AuthControllerTest.java
+/home/cris/Descargas/Sum2_fs3/sum2_fs3/src/test/java/com/newproject/controller/ProductoControllerTest.java
+/home/cris/Descargas/Sum2_fs3/sum2_fs3/src/test/java/com/newproject/controller/UsuarioControllerTest.java
+/home/cris/Descargas/Sum2_fs3/sum2_fs3/src/test/java/com/newproject/exception/FileProcessingExceptionTest.java
+/home/cris/Descargas/Sum2_fs3/sum2_fs3/src/test/java/com/newproject/exception/GlobalExceptionHandlerTest.java
+/home/cris/Descargas/Sum2_fs3/sum2_fs3/src/test/java/com/newproject/exception/ResourceNotFoundExceptionTest.java
+/home/cris/Descargas/Sum2_fs3/sum2_fs3/src/test/java/com/newproject/security/JwtUtilTest.java
+/home/cris/Descargas/Sum2_fs3/sum2_fs3/src/test/java/com/newproject/service/CustomUserDetailsServiceTest.java
+/home/cris/Descargas/Sum2_fs3/sum2_fs3/src/test/java/com/newproject/service/ProductoServiceTest.java
+/home/cris/Descargas/Sum2_fs3/sum2_fs3/src/test/java/com/newproject/service/UsuarioServiceTest.java
