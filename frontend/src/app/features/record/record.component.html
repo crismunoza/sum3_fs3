@@ -1,0 +1,17 @@
+<div class="purchase-history container mt-4">
+  <h2>Historial de Compras</h2>
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Producto</th>
+        <th>Precio</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of historyItems">
+        <td>{{ item.producto.nombre }}</td>
+        <td>{{ item.producto.precio | currency }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

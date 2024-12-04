@@ -23,4 +23,16 @@ describe('HeadersComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('debería verificar el estado de inicio de sesión', () => {
+    spyOn(component, 'checkLoginStatus').and.callThrough();
+    component.ngOnInit();
+    expect(component.checkLoginStatus).toHaveBeenCalled();
+  });
+
+  it('debería cerrar sesión correctamente', () => {
+    spyOn(component.authService, 'logout').and.callThrough();
+    component.logout();
+    expect(component.authService.logout).toHaveBeenCalled();
+  });
 });

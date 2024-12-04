@@ -2,45 +2,72 @@
 <div>
     <img src="/img/banner.jpg" alt="Hero Image" class="hero-image">
 </div>
-<!-- Carrusel de Nuevas Preventas -->
-<!-- Sección de los antiguos -->
+
 <div class="container my-4">
-    <h2 class="text-center text-custom section-title" id="newproductos">Nuevos Productos</h2>
     <div class="row">
-        <div *ngFor="let prod of productosNuevos" class="col-md-3 col-sm-6 mb-3">
-            <div class="card product-card">
-                <img [src]="prod.url" class="card-img-top product-img" [alt]="prod.nombre">
-                <div class="card-body">
-                    <h5 class="card-title">{{ prod.nombre }}</h5>
-                    <span class="card-subtitle">{{ prod.descripcion }}</span>
-                    <br>
-                    <p class="card-text">
-                        <span class="text-danger">en ${{ prod.precio }}</span> <br>
-                        <span *ngIf="prod.stock === 0">Sin Stock</span>
-                        <span *ngIf="prod.stock > 0">En Stock</span>
-                    </p>
+        <!-- Filtros en la barra lateral izquierda -->
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body p-2">
+                    <h5 class="card-title">Filtros</h5>
+                    <div class="form-group">
+                        <label for="precioMin">Precio mínimo: {{ filtroPrecioMin }}</label>
+                        <input type="range" id="precioMin" [(ngModel)]="filtroPrecioMin" min="0" max="100000" step="1000">
+                    </div>
+                    <div class="form-group">
+                        <label for="precioMax">Precio máximo: {{ filtroPrecioMax }}</label>
+                        <input type="range" id="precioMax" [(ngModel)]="filtroPrecioMax" min="0" max="100000" step="1000">
+                    </div>
+                    <div class="form-group form-check">
+                        <input type="checkbox" id="stock" [(ngModel)]="filtroStock" class="form-check-input">
+                        <label for="stock" class="form-check-label">Solo en stock</label>
+                    </div>
+                    <button (click)="aplicarFiltros()" class="btn btn-primary w-100">Aplicar Filtros</button>
+                    <button (click)="quitarFiltros()" class="btn btn-clear w-100">Quitar Filtros</button>
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
-<!-- Sección de los antiguos -->
-<div class="container my-4">
-    <h2 class="text-center text-custom section-title" id="productos">Productos</h2>
-    <div class="row">
-        <div *ngFor="let prod of productosAntiguos" class="col-md-3 col-sm-6 mb-3">
-            <div class="card product-card">
-                <img [src]="prod.url" class="card-img-top product-img" [alt]="prod.nombre">
-                <div class="card-body">
-                    <h5 class="card-title">{{ prod.nombre }}</h5>
-                    <span class="card-subtitle">{{ prod.descripcion }}</span>
-                    <br>
-                    <p class="card-text">
-                        <span class="text-danger">en ${{ prod.precio }}</span> <br>
-                        <span *ngIf="prod.stock === 0">Sin Stock</span>
-                        <span *ngIf="prod.stock > 0">En Stock</span>
-                    </p>
+        <!-- Productos Nuevos -->
+        <div class="col-md-9">
+            <h2 class="text-center text-custom section-title" id="newproductos">Nuevos Productos</h2>
+            <div class="row">
+                <div *ngFor="let prod of productosNuevos" class="col-md-3 col-sm-6 mb-3">
+                    <div class="card product-card">
+                        <img [src]="prod.url" class="card-img-top product-img" [alt]="prod.nombre">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ prod.nombre }}</h5>
+                            <span class="card-subtitle">{{ prod.descripcion }}</span>
+                            <br>
+                            <p class="card-text">
+                                <span class="text-danger">en ${{ prod.precio }}</span> <br>
+                                <span *ngIf="prod.stock === 0">Sin Stock</span>
+                                <span *ngIf="prod.stock > 0">En Stock</span>
+                            </p>
+                            <button *ngIf="loggedInUser?.role === 'ROLE_USER' || loggedInUser?.role === 'ROLE_ADMIN'" class="btn btn-success" (click)="comprarProducto(prod)">Comprar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Productos Antiguos -->
+            <h2 class="text-center text-custom section-title" id="productos">Productos</h2>
+            <div class="row">
+                <div *ngFor="let prod of productosAntiguos" class="col-md-3 col-sm-6 mb-3">
+                    <div class="card product-card">
+                        <img [src]="prod.url" class="card-img-top product-img" [alt]="prod.nombre">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ prod.nombre }}</h5>
+                            <span class="card-subtitle">{{ prod.descripcion }}</span>
+                            <br>
+                            <p class="card-text">
+                                <span class="text-danger">en ${{ prod.precio }}</span> <br>
+                                <span *ngIf="prod.stock === 0">Sin Stock</span>
+                                <span *ngIf="prod.stock > 0">En Stock</span>
+                            </p>
+                            <button *ngIf="loggedInUser?.role === 'ROLE_USER' || loggedInUser?.role === 'ROLE_ADMIN'" class="btn btn-success" (click)="comprarProducto(prod)">Comprar</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

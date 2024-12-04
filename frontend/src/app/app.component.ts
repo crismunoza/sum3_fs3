@@ -34,7 +34,7 @@ export class AppComponent implements OnInit {
       .subscribe((event: NavigationEnd) => {
         this.showHeader = event.url !== '/Login' && event.url !== '/Register' && event.url !== '/ResetPass';
         this.showNavbar = event.url !== '/Login' && event.url !== '/Register' && event.url !== '/ResetPass';
-        this.showFooter = event.url !== '/Login' && event.url !== '/Register' && event.url !== '/ResetPass' && event.url !== '/Profile' && event.url !== '/Admin' && event.url !== '/Products' && event.url !== '/Addproducts';     
+        this.showFooter = event.url !== '/Login' && event.url !== '/Register' && event.url !== '/ResetPass' && event.url !== '/Profile' && event.url !== '/Admin' && event.url !== '/Products' && event.url !== '/Addproducts' && event.url !== '/Shopping' && event.url !== '/Record';     
       });
   }
 }

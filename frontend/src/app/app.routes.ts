@@ -7,6 +7,8 @@ import { ResetpassComponent } from './features/resetpass/resetpass.component';
 import { ProfileComponent}  from './features/profile/profile.component';
 import { ProductComponent } from './features/product/product.component';
 import{ AddproductComponent } from './features/addproduct/addproduct.component';
+import{ ShoppingComponent} from './features/shopping/shopping.component';
+import {RecordComponent} from './features/record/record.component';
 import { AuthGuard } from './core/service/guards/auth.guard';
 
 
@@ -35,5 +37,7 @@ export const routes: Routes = [
     { path: 'Register', component: RegisterComponent },
     { path: 'ResetPass', component: ResetpassComponent },
     { path: 'Profile', component: ProfileComponent},
+    { path: 'Shopping', component: ShoppingComponent}, 
+    {path: 'Record',component: RecordComponent}, 
     { path: '**', redirectTo: '/Home', pathMatch: 'full' }
 ];

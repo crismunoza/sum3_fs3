@@ -16,7 +16,7 @@ export class HeadersComponent {
   
   loggedInUser: user | null = null;
 
-  constructor(private authService: AuthService) {}
+  constructor(public authService: AuthService) {}
   ngOnInit() {
     this.checkLoginStatus();
     this.smoothScroll();
